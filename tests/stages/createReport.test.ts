@@ -22,7 +22,7 @@ describe('createReport', () => {
         const dataCollector = createDataCollector<JsonReport>();
         dataCollector.add(report);
 
-        mockContext({ payload: { after: '123456' } });
+        mockContext({ payload: { after: '999' } });
         expect(
             await createReport(
                 dataCollector,

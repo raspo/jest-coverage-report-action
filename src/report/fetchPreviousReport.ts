@@ -17,9 +17,15 @@ export async function fetchPreviousReport(
         }
     );
 
+    console.log('commentList ===> ', JSON.stringify(commentList));
+
+    console.log('========================================================');
+
     const previousReport = commentList.find((comment) =>
         (comment as { body: string }).body.startsWith(getReportTag(options))
     );
+
+    console.log('previousReport ===> ', JSON.stringify(previousReport));
 
     return !previousReport ? null : previousReport;
 }
