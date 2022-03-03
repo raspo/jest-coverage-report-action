@@ -260,7 +260,7 @@ describe('run', () => {
         });
         await run();
         expect(getCoverageMock).toBeCalledTimes(2);
-        expect(switchBranchMock).toBeCalledWith('999');
+        expect(switchBranchMock).toBeCalledWith('888');
     });
 
     it('should skip if headCoverage is not generated', async () => {
