@@ -31,73 +31,71 @@ export const createCoverageAnnotations = (
 ): Array<Annotation> => {
     const annotations: Partial<Annotation>[] = [];
 
-    Object.entries(jsonReport.coverageMap).forEach(
-        ([fileName, fileCoverage]) => {
-            const normalizedFilename = relative(process.cwd(), fileName);
-            Object.entries(fileCoverage.statementMap).forEach(
-                ([statementIndex, statementCoverage]) => {
-                    if (fileCoverage.s[+statementIndex] === 0) {
-                        annotations.push({
-                            ...getLocation(
-                                statementCoverage.start,
-                                statementCoverage.end
-                            ),
-                            path: normalizedFilename,
-                            annotation_level: 'warning',
-                            title: i18n('notCoveredStatementTitle'),
-                            message: i18n('notCoveredStatementMessage'),
-                        });
-                    }
-                }
-            );
+    // `jsonReport` can be the complete test result report, or a json report of the code coverage alone
+    const coverageMap = jsonReport.coverageMap || jsonReport;
 
-            Object.entries(fileCoverage.branchMap).forEach(
-                ([branchIndex, branchCoverage]) => {
-                    if (branchCoverage.locations) {
-                        branchCoverage.locations.forEach(
-                            (location, locationIndex) => {
-                                if (
-                                    fileCoverage.b[+branchIndex][
-                                        locationIndex
-                                    ] === 0
-                                ) {
-                                    annotations.push({
-                                        ...getLocation(
-                                            location.start,
-                                            location.end
-                                        ),
-                                        path: normalizedFilename,
-                                        annotation_level: 'warning',
-                                        title: i18n('notCoveredBranchTitle'),
-                                        message: i18n(
-                                            'notCoveredBranchMessage'
-                                        ),
-                                    });
-                                }
+    Object.entries(coverageMap).forEach(([fileName, fileCoverage]) => {
+        const normalizedFilename = relative(process.cwd(), fileName);
+        Object.entries(fileCoverage.statementMap).forEach(
+            ([statementIndex, statementCoverage]) => {
+                if (fileCoverage.s[+statementIndex] === 0) {
+                    annotations.push({
+                        ...getLocation(
+                            statementCoverage.start,
+                            statementCoverage.end
+                        ),
+                        path: normalizedFilename,
+                        annotation_level: 'warning',
+                        title: i18n('notCoveredStatementTitle'),
+                        message: i18n('notCoveredStatementMessage'),
+                    });
+                }
+            }
+        );
+
+        Object.entries(fileCoverage.branchMap).forEach(
+            ([branchIndex, branchCoverage]) => {
+                if (branchCoverage.locations) {
+                    branchCoverage.locations.forEach(
+                        (location, locationIndex) => {
+                            if (
+                                fileCoverage.b[+branchIndex][locationIndex] ===
+                                0
+                            ) {
+                                annotations.push({
+                                    ...getLocation(
+                                        location.start,
+                                        location.end
+                                    ),
+                                    path: normalizedFilename,
+                                    annotation_level: 'warning',
+                                    title: i18n('notCoveredBranchTitle'),
+                                    message: i18n('notCoveredBranchMessage'),
+                                });
                             }
-                        );
-                    }
+                        }
+                    );
                 }
-            );
+            }
+        );
 
-            Object.entries(fileCoverage.fnMap).forEach(
-                ([functionIndex, functionCoverage]) => {
-                    if (fileCoverage.f[+functionIndex] === 0) {
-                        annotations.push({
-                            ...getLocation(
-                                functionCoverage.decl.start,
-                                functionCoverage.decl.end
-                            ),
-                            path: normalizedFilename,
-                            annotation_level: 'warning',
-                            title: i18n('notCoveredFunctionTitle'),
-                            message: i18n('notCoveredFunctionMessage'),
-                        });
-                    }
+        Object.entries(fileCoverage.fnMap).forEach(
+            ([functionIndex, functionCoverage]) => {
+                if (fileCoverage.f[+functionIndex] === 0) {
+                    annotations.push({
+                        ...getLocation(
+                            functionCoverage.decl.start,
+                            functionCoverage.decl.end
+                        ),
+                        path: normalizedFilename,
+                        annotation_level: 'warning',
+                        title: i18n('notCoveredFunctionTitle'),
+                        message: i18n('notCoveredFunctionMessage'),
+                    });
                 }
-            );
-        }
-    );
+            }
+        );
+    });
 
     return annotations.filter(
         (annotation): annotation is Annotation =>
